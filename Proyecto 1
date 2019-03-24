@@ -122,11 +122,14 @@ class Contacto:
         dia_act = fecha.day
         dia_nac, mes_nac, anio_nac  = self.fecha_nac.split('/')
         
-        if (int(mes_nac) >= int(mes_act)) and (int(dia_nac) >= int(dia_act)):
-            return str(int(anio_act) - int(anio_nac)) 
-        
+        if mes_act <= int(mes_nac):
+            if dia_act < int (dia_nac):
+                return str(anio_act - int(anio_nac) - 1) 
+            else:
+                return str(anio_act - int(anio_nac))
         else:
-            return str(int(anio_act) - int(anio_nac) -1) 
+            return str(anio_act - int(anio_nac))
+        
         
     def __repr__(self):
         str_out = "Contacto:\n"
@@ -221,14 +224,54 @@ def edit_contact(contact_obj):
     '''
     Funcion que cambia los cambios de un objeto Contacto
     '''
-    pass
+    valor = input("Nombre [{}] : ".format(contact_obj.nombre))
+    if valor != "-":
+        contact_obj.nombre = valor
+                
+    valor = input("Apellido [{}] : ".format(contact_obj.apellido))
+    if valor != "-":
+        contact_obj.apellido = valor
+                
+    valor = input("Teléfono fijo [{}] : ".format(contact_obj.t_fijo))
+    if valor != "-":
+        contact_obj.t_fijo = valor
+                
+    valor = input("Teléfono móvil [{}] : ".format(contact_obj.t_movil))
+    if valor != "-":
+        contact_obj.t_movil = valor
+                
+    valor = input("Email personal [{}] : ".format(contact_obj.email_per))
+    if valor != "-":
+        contact_obj.email_per = valor
+                
+    valor = input("Email laboral [{}] : ".format(contact_obj.email_lab))
+    if valor != "-":
+        contact_obj.email_lab = valor
+                
+    valor = input("Fecha de nacimiento [{}] : ".format(contact_obj.fecha_nac))
+    if valor != "-":
+        contact_obj.fecha_nac = valor
+    print ()
+    print(" Los nuevos datos del contacto son : " )
+    print ()
+    
+    print(contact_obj)
+    time.sleep(4)
 
 
 def delete_contact(contact_list):
     '''
     Funcion que elimina un objeto Contacto de una lista de objetos Contactos
     '''
-    pass
+    enomb, eapell = input("Ingrese el nombre del contacto a borrar: ").split()
+    
+    for contacto in contact_list:
+        if contacto.nombre == enomb and contacto.apellido == eapell:
+            contact_list.remove(contacto)
+    
+    time.sleep(1)
+    print("El contacto fue borrado exitosamente.")
+    time.sleep(2)
 
 
 def show_contact(contact):
@@ -236,7 +279,7 @@ def show_contact(contact):
     Funcion que muestra los detalles de un objeto Contacto <print(obj)>
     '''
     print(contact)
-
+    time.sleep(4)
 
 def list_contact(contact_list):
     '''
@@ -271,8 +314,7 @@ def salir():
 
 def main():
     
-    lista = read_file('contactos(1).json')
-    
+    lista = read_file('contactos.json')
     while True:
         opc = show_menu()
         if opc in [1, 2, 3, 4, 5]:
@@ -281,11 +323,44 @@ def main():
             
             if opc is 2:
                 list_contact(lista)
+                time.sleep(5)
                 
             elif opc is 3:
                 search = input("Ingrese el nombre del contacto a buscar: ")
                 usuario = find_contact(lista,search)
                 show_contact(usuario)
+                
+                
+            elif opc is 4: 
+                clear_screen()
+                
+                list_contact (lista)
+                print ()
+                numero = int(input ("Ingrese el numero del contacto a editar : "))
+                
+                print ()
+                prov = []
+                for person in lista:
+                    nombre = person.nombre + " " + person.apellido
+                    prov.append(nombre)
+                    prov.sort()
+    
+                name , apell = prov[numero-1].split()
+
+                print (" ingrese '-' para no modificar el dato.")
+                print ()
+                cuenta = 0
+
+                for contacto in lista:
+                    if contacto.nombre == name and contacto.apellido == apell:
+                        salida = cuenta
+                    else: 
+                        cuenta += 1
+                edit_contact(lista[salida])
+                
+                
+            elif opc is 5 : 
+                delete_contact(lista)
                 
         elif opc == 0:
             if salir():
