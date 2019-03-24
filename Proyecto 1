@@ -196,9 +196,6 @@ def write_file(file, contact_list):
                             'fecha_nac':i.fecha_nac
                             })
     
-    
-    with open(file, mode = 'w') as json_file:
-        json.dump(data,json_file)
 
 
 def find_contact(contact_list, name_str):
@@ -206,7 +203,18 @@ def find_contact(contact_list, name_str):
     Esta funcion busca en una lista de contactos (con objetos Contactos)
     un contacto especificado por nombre
     '''
-    pass
+    found = False
+    
+    for con in contact_list:
+        if name_str.lower() in con.nombre.lower():
+            found = True
+            return con
+            
+        
+        
+    if not found:
+        print("No se han encontrado contactos con el nombre anterior")
+            
 
 
 def edit_contact(contact_obj):
@@ -227,7 +235,7 @@ def show_contact(contact):
     '''
     Funcion que muestra los detalles de un objeto Contacto <print(obj)>
     '''
-    pass
+    print(contact)
 
 
 def list_contact(contact_list):
@@ -235,8 +243,20 @@ def list_contact(contact_list):
     Funcion que muestra un listado de contactos numerados con la informacion
     de nombre y apellido en ordenado de forma alfabetica
     '''
-    pass
-
+    
+    prov = []
+    
+    for person in contact_list:
+        nombre = person.nombre + " " + person.apellido
+        prov.append(nombre)
+        prov.sort()
+        
+    print("Lista de Contactos:")
+    print("===============================")
+     
+    for idx, element in enumerate(prov,1):  
+        print(f"{idx:2}. {element}")
+        
 
 def salir():
     '''
@@ -250,11 +270,23 @@ def salir():
         return False
 
 def main():
+    
+    lista = read_file('contactos(1).json')
+    
     while True:
         opc = show_menu()
         if opc in [1, 2, 3, 4, 5]:
             print("\nSelecciono la opcion", opc)
             time.sleep(1)
+            
+            if opc is 2:
+                list_contact(lista)
+                
+            elif opc is 3:
+                search = input("Ingrese el nombre del contacto a buscar: ")
+                usuario = find_contact(lista,search)
+                show_contact(usuario)
+                
         elif opc == 0:
             if salir():
                 break
@@ -264,6 +296,5 @@ def main():
 
 if __name__ == '__main__':
     main()
-
 
  
