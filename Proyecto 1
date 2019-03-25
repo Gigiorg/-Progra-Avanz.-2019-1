@@ -195,10 +195,12 @@ def write_file(file, contact_list):
                             'apellido': i.apellido,
                             'edad': i.edad,
                             'telefono':{'fijo':i.t_fijo,'movil':i.t_movil},
-                            'email':{'personal':i.email_per,'movil':i.email_lab},
+                            'email':{'personal':i.email_per,'trabajo':i.email_lab},
                             'fecha_nac':i.fecha_nac
                             })
     
+    with open(file, mode='w') as json_file:
+        json.dump(data, json_file)
 
 
 def find_contact(contact_list, name_str):
@@ -389,6 +391,7 @@ def main():
                 
         elif opc == 0:
             if salir():
+                write_file('contactos.json',lista)
                 break
         else:
             print("\nLa opcion ingresada no es valida")
@@ -396,3 +399,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+ 
