@@ -263,7 +263,10 @@ def delete_contact(contact_list):
     '''
     Funcion que elimina un objeto Contacto de una lista de objetos Contactos
     '''
-    enomb, eapell = input("Ingrese el nombre del contacto a borrar: ").split()
+    enomb, eapell = input("Ingrese el nombre y apellido del contacto a borrar: ").split()
+    
+    enomb.capitalize()
+    eapell.capitalize()
     
     for contacto in contact_list:
         if contacto.nombre == enomb and contacto.apellido == eapell:
@@ -273,7 +276,26 @@ def delete_contact(contact_list):
     print("El contacto fue borrado exitosamente.")
     time.sleep(2)
 
-
+def agregar_contacto (lista):
+    '''
+    Agrega un cotacto a la lista
+    '''
+    
+    print("\nVamos a agregar un contacto, ingrese el dato en cada campo:")
+    nombre = input ("Ingrese nombre : ")
+    apellido = input ("Ingrese apellido : ")
+    telefono_f = input ("Ingrese teléfono fijo : ")
+    telefono_m = input ("Ingrese teléfono móvil : ")
+    email_p = input ("Ingrese email personal : ")
+    email_l = input ("Ingrese email laboral : ")
+    fecha_naci = input ("Ingrese fecha de nacimiento : ")
+    lista.append (Contacto(nombre, apellido, telefono_f, telefono_m, email_p, email_l, fecha_naci))
+    print ("\nSu contacto ha sido agregado correctamente.")
+    print()
+    print (lista[-1])
+    time.sleep(4)
+    
+    
 def show_contact(contact):
     '''
     Funcion que muestra los detalles de un objeto Contacto <print(obj)>
@@ -321,7 +343,10 @@ def main():
             print("\nSelecciono la opcion", opc)
             time.sleep(1)
             
-            if opc is 2:
+            if opc is 1:
+                agregar_contacto (lista)
+                
+            elif opc is 2:
                 list_contact(lista)
                 time.sleep(5)
                 
@@ -371,5 +396,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
- 
