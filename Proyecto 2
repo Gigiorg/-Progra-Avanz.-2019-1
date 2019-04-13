@@ -4,7 +4,6 @@ import psutil
 from datetime import datetime
 from tkinter import *
 from tkinter import ttk
-from tkinter import *
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
@@ -12,7 +11,7 @@ from matplotlib.figure import Figure
 root = Tk()
 
 root.title("Monitor PC")
-root.geometry('600x500+200+200')
+root.geometry('850x600+200+200')
 root.resizable(0,0)
 
 #Variables
@@ -24,6 +23,10 @@ root.resizable(0,0)
 
 valfreqCPU_percent = DoubleVar(value=0.0)
 valfreqCPU = DoubleVar(value = 0.0)
+interfaceethernetIP = StringVar()
+interfaceethernetIP.set(psutil.net_if_addrs()['Ethernet'][1].address)
+memoriactotal = DoubleVar(value = 0.0)
+memoriacenusopercent = DoubleVar(value = 0.0)
 
 
 # Funciones
@@ -37,9 +40,17 @@ def read_cpu_data():
     currentfreq = psutil.cpu_freq().current
     freqpercent = (currentfreq/(maxfreq - minfreq))*100
     
+    mctotaldisco = psutil.disk_usage("C:\\").total/1e9
+    mcenusodisco = psutil.disk_usage("C:\\").percent
+    
     valfreqCPU_percent.set(freqpercent)
     valfreqCPU.set(currentfreq)
     lblFreqCPUval.config(text="{:.1f}".format(valfreqCPU.get()))
+    memoriactotal.set(mctotaldisco)
+    memoriacenusopercent.set(mcenusodisco)
+    lbltotalMemoriadiscocx.config(text="{:.1f}".format(memoriactotal.get()))
+    
+    
     
     
     root.after(1000, read_statistics)
@@ -47,7 +58,7 @@ def read_cpu_data():
 root.after(100, read_statistics)
 
 #Frames
-
+ 
 frm1 = Frame(root, relief = GROOVE, borderwidth = 5)
 frm2 = Frame(root)
 frm3 = Frame(root)
@@ -80,15 +91,23 @@ main_menu.add_cascade(label="Ayuda", menu=menu_ayuda)
 # Widgets
 
 lblFreqCPU = Label(frm1, text="   Frecuencia del CPU [MHz] : ", bg='black', fg='white')     
-lblFreqCPUval = Label(frm1, text="{:.1f}".format(valfreqCPU.get()), bg='black', fg='white')
+lblFreqCPUval = Label(frm1, text="{:.1f}".format(valfreqCPU.get()), fg='blue', font = "Verdana")
 barFreqCPU_percent = ttk.Progressbar(frm1, length=200, variable=valfreqCPU_percent)
+lblinterfaceethernetIP = Label(frm1, text ="Interface Ethernet IP Address: ", bg = 'black', fg = 'white')
+lblinterfaceethernetIPaddress = Label(frm1, text ="{}".format(interfaceethernetIP.get()), fg = 'blue', font = "Verdana")
+lbltotalMemoriadiscoc = Label(frm1, text = "Memoria Total en Particion C:\\ [GB]: ", bg='black', fg='white')
+lblMemoriadiscocusadapercent = Label(frm1, text = "Memoria usada en Particion C:\\[%]: ", bg='black', fg='white')
+lbltotalMemoriadiscocx = Label(frm1, text ="{}".format(memoriactotal.get()), fg = 'blue', font = "Verdana")
+barMemoriadiscocusada = ttk.Progressbar(frm1, length = 200, variable = memoriacenusopercent)
 
 
 lblFreqCPU.grid(row=0, column=0, pady=10)
-lblFreqCPUval.grid(row=0, column=1) 
-barFreqCPU_percent.grid(row=1, column=0, columnspan=3) 
-
-
-
-
+lblFreqCPUval.grid(row=0, column=1, padx = 10) 
+barFreqCPU_percent.grid(row=1, column=0, columnspan=2) 
+lblinterfaceethernetIP.grid(row = 0, column = 2, padx = 6)
+lblinterfaceethernetIPaddress.grid(row = 1, column = 2)
+lbltotalMemoriadiscoc.grid(row = 0, column = 3, padx = 10, sticky = 'e')
+lblMemoriadiscocusadapercent.grid(row = 1, column = 3, padx = 10 , sticky = 'e')
+lbltotalMemoriadiscocx.grid(row = 0, column = 4, padx = 4)
+barMemoriadiscocusada.grid(row = 1, column = 4)
 root.mainloop()
