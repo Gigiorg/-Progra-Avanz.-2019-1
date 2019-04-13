@@ -1,0 +1,53 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import psutil
+from datetime import datetime
+from tkinter import *
+from tkinter import ttk
+from tkinter import *
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+
+
+root = Tk()
+
+root.title("Monitor PC")
+root.geometry('600x500+200+200')
+root.resizable(0,0)
+
+#Frames
+
+frm1 = Frame(root, relief = SUNKEN, borderwidth = 5)
+frm2 = Frame(root)
+frm3 = Frame(root)
+frm4 = Frame(root)
+
+frm1.grid(row = 0, column = 1, columnspan = 3)
+frm2.grid(row = 1, column = 0) 
+frm3.grid(row = 1, column = 1)
+frm4.grid(row = 1, column = 2)
+
+#Menus
+main_menu = Menu(root)
+root.configure(menu = main_menu)
+
+menu_archivo = Menu(main_menu, tearoff=False)
+menu_editar = Menu(main_menu, tearoff=False)
+menu_ayuda = Menu(main_menu, tearoff=False)
+
+menu_ayuda.add_command(label="Acerca de...")
+
+main_menu.add_cascade(label="Archivo", menu=menu_archivo)
+main_menu.add_cascade(label="Editar", menu=menu_editar)
+main_menu.add_cascade(label="Ayuda", menu=menu_ayuda)
+
+# Status Bar
+#status_bar = Label(root, text="Listo", bd=1, relief=SUNKEN, anchor=W)
+#status_bar.pack(side=BOTTOM, expand=False, fill=X)
+
+
+
+
+
+
+root.mainloop()
