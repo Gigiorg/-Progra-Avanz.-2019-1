@@ -15,9 +15,40 @@ root.title("Monitor PC")
 root.geometry('600x500+200+200')
 root.resizable(0,0)
 
+#Variables
+
+
+
+
+# Obj/ Var
+
+valfreqCPU_percent = DoubleVar(value=0.0)
+valfreqCPU = DoubleVar(value = 0.0)
+
+
+# Funciones
+
+def read_statistics():
+    read_cpu_data()
+    
+def read_cpu_data():
+    minfreq = psutil.cpu_freq().min
+    maxfreq = psutil.cpu_freq().max
+    currentfreq = psutil.cpu_freq().current
+    freqpercent = (currentfreq/(maxfreq - minfreq))*100
+    
+    valfreqCPU_percent.set(freqpercent)
+    valfreqCPU.set(currentfreq)
+    lblFreqCPUval.config(text="{:.1f}".format(valfreqCPU.get()))
+    
+    
+    root.after(1000, read_statistics)
+    
+root.after(100, read_statistics)
+
 #Frames
 
-frm1 = Frame(root, relief = SUNKEN, borderwidth = 5)
+frm1 = Frame(root, relief = GROOVE, borderwidth = 5)
 frm2 = Frame(root)
 frm3 = Frame(root)
 frm4 = Frame(root)
@@ -46,6 +77,16 @@ main_menu.add_cascade(label="Ayuda", menu=menu_ayuda)
 #status_bar.pack(side=BOTTOM, expand=False, fill=X)
 
 
+# Widgets
+
+lblFreqCPU = Label(frm1, text="   Frecuencia del CPU [MHz] : ", bg='black', fg='white')     
+lblFreqCPUval = Label(frm1, text="{:.1f}".format(valfreqCPU.get()), bg='black', fg='white')
+barFreqCPU_percent = ttk.Progressbar(frm1, length=200, variable=valfreqCPU_percent)
+
+
+lblFreqCPU.grid(row=0, column=0, pady=10)
+lblFreqCPUval.grid(row=0, column=1) 
+barFreqCPU_percent.grid(row=1, column=0, columnspan=3) 
 
 
 
