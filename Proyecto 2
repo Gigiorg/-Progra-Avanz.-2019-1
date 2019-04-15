@@ -1,3 +1,4 @@
+
 import csv
 import psutil
 from datetime import datetime
@@ -20,7 +21,12 @@ global data_currentfreq
 data_currentfreq = [0] * 100
 global i
 i = 0
-
+global variable_1
+global variable_2
+global variable_3
+variable_1 = 1
+variable_2 = 1
+variable_3 = 1 
 # Obj/ Var
 
 valfreqCPU_percent = DoubleVar(value = 0.0)
@@ -35,35 +41,42 @@ memoriacenusopercent = DoubleVar(value = 0.0)
 
 def toggleu():
     
+    global variable_1 
     
     if btnLogu.config('relief')[-1] == SUNKEN:
         btnLogu.config(relief = RAISED, text = "Log Memory", fg = 'black')
+        variable_1 = 1
         return False
     else:
         btnLogu.config(relief = SUNKEN, text = "Login Data", fg = 'red')
+        variable_1 = 2
         return True
 
 
 def toggled():
-    
+    global variable_2
     
     if btnLogd.config('relief')[-1] == SUNKEN:
         btnLogd.config(relief = RAISED, text = "Log Memory", fg = 'black')
+        variable_2 = 1
         return False
     
     else:
         btnLogd.config(relief = SUNKEN, text = "Login Data", fg = 'red')
+        variable_2 = 2
         return True   
 
 def togglet():
-    
+    global variable_3
     
     if btnLogt.config('relief')[-1] == SUNKEN:
         btnLogt.config(relief = RAISED, text = "Log Memory", fg = 'black')
+        variable_3 = 1
         return False
     
     else:
         btnLogt.config(relief = SUNKEN, text = "Login Data", fg = 'red')
+        variable_3 = 2
         return True
         
         
@@ -73,6 +86,10 @@ def read_statistics():
    
 def read_cpu_data():
    global i
+   global variable_1
+   global variable_2
+   global variable_3
+   
    # valores para ploteo
    global data_cpu
    data_cpu.pop(0)
@@ -124,6 +141,8 @@ def read_cpu_data():
    
    i += 1
    
+   grabar(variable_1,variable_2,variable_3)
+       
    if (i == 10) :
     
        #memoria del disco total y porcentual
@@ -140,6 +159,7 @@ def read_cpu_data():
        #imprimir valores sobre la barra de memoria de disco
        lbltotalMemoriadiscocx.config(text="{:.1f}".format(memoriactotal.get()))
        i = 0
+       
    #######################################################################
    
    
@@ -148,10 +168,29 @@ def read_cpu_data():
    root.after(100, read_statistics)
    
    
+def grabar (valor,valor1,valor2):
+    if valor == 2:
+       
+       with open("grabar.csv", mode='a') as f: 
+           f.write("\nUSO DEL CPU(%) ; TIEMPO\n")
+           f.write(str(psutil.cpu_percent()) +'           ; ' + str(datetime.now()))
+           f.close()
+           
+    if valor1 == 2:
+       
+       with open("grabar.csv", mode='a') as f:
+           f.write("\nUSO DE LA RAM(%); TIEMPO\n")
+           f.write(str(psutil.virtual_memory().percent) +'            ; ' + str(datetime.now()))
+           f.close()
+           
+    if valor2 == 2:
+       
+       with open("grabar.csv", mode='a') as f: 
+           f.write("\nCPU EN IDLE(%); TIEMPO\n")
+           f.write(str(psutil.cpu_times_percent().idle) +'          ; ' + str(datetime.now()))
+           f.close()
+    
    
-   
-
-
 #Frames
 frm = Frame(root)
 frm1 = Frame(frm, relief = GROOVE, borderwidth = 5)
@@ -229,9 +268,7 @@ btnLogu.grid(row = 0, column = 0, padx = 150)
 btnLogd.grid(row = 0, column = 1)
 btnLogt.grid(row = 0, column = 2, padx = 150)
 
-with open("registro.csv", mode='w') as f: 
-    f.write("VALOR; TIEMPO\n")
-    f.write(str(psutil.cpu_percent()) +'; ' + str(datetime.now()))
+
     
 
 root.after(100, read_statistics)
