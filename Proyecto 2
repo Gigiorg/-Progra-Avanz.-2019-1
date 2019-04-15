@@ -1,27 +1,29 @@
-import numpy as np
-import matplotlib.pyplot as plt
+import csv
 import psutil
 from datetime import datetime
 from tkinter import *
 from tkinter import ttk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
-
-
+import numpy as np
 root = Tk()
-
-root.title("Monitor PC")
-root.geometry('850x600+200+200')
+root.title("Monitoreo de la PC")
+root.geometry('860x600+200+200')
 root.resizable(0,0)
 
 #Variables
-
-
-
+global data_cpu
+data_cpu = [0] * 100
+global data_freq
+data_freq = [0] * 100
+global data_currentfreq
+data_currentfreq = [0] * 100
+global i
+i = 0
 
 # Obj/ Var
 
-valfreqCPU_percent = DoubleVar(value=0.0)
+valfreqCPU_percent = DoubleVar(value = 0.0)
 valfreqCPU = DoubleVar(value = 0.0)
 interfaceethernetIP = StringVar()
 interfaceethernetIP.set(psutil.net_if_addrs()['Ethernet'][1].address)
@@ -31,43 +33,153 @@ memoriacenusopercent = DoubleVar(value = 0.0)
 
 # Funciones
 
+def toggleu():
+    
+    
+    if btnLogu.config('relief')[-1] == SUNKEN:
+        btnLogu.config(relief = RAISED, text = "Log Memory", fg = 'black')
+        return False
+    else:
+        btnLogu.config(relief = SUNKEN, text = "Login Data", fg = 'red')
+        return True
+
+
+def toggled():
+    
+    
+    if btnLogd.config('relief')[-1] == SUNKEN:
+        btnLogd.config(relief = RAISED, text = "Log Memory", fg = 'black')
+        return False
+    
+    else:
+        btnLogd.config(relief = SUNKEN, text = "Login Data", fg = 'red')
+        return True   
+
+def togglet():
+    
+    
+    if btnLogt.config('relief')[-1] == SUNKEN:
+        btnLogt.config(relief = RAISED, text = "Log Memory", fg = 'black')
+        return False
+    
+    else:
+        btnLogt.config(relief = SUNKEN, text = "Login Data", fg = 'red')
+        return True
+        
+        
 def read_statistics():
-    read_cpu_data()
     
+   read_cpu_data()
+   
 def read_cpu_data():
-    minfreq = psutil.cpu_freq().min
-    maxfreq = psutil.cpu_freq().max
-    currentfreq = psutil.cpu_freq().current
-    freqpercent = (currentfreq/(maxfreq - minfreq))*100
+   global i
+   # valores para ploteo
+   global data_cpu
+   data_cpu.pop(0)
+   data_cpu.append(psutil.cpu_percent())
+   # calculo de datos 
+   # frecuencias minima y maxima del cpu
+   minfreq = psutil.cpu_freq().min
+   maxfreq = psutil.cpu_freq().max
+   #frecuencia del cpu y porcentaje 
+   currentfreq = psutil.cpu_freq().current
+   freqpercent = (currentfreq/(maxfreq - minfreq))*100
+   # uso de ram
+   currentram = psutil.virtual_memory().percent
+   #####
+   idlecpupercent = psutil.cpu_times_percent().idle
+
+   global data_freq
+   data_freq.pop(0)
+   data_freq.append(currentram)
+   
+   global data_currentfreq
+   data_currentfreq.pop(0)
+   data_currentfreq.append(idlecpupercent)
+   
+   axi1.cla()
+   axi1.grid()
+   axi1.set_ylim(0, 100)
+   axi1.set_yticklabels([0, 20, 40, 60, 80, 100])   #fontsize=6
+   axi1.plot(data_cpu, color='blue')
+   axi1.set_title ("Uso del CPU (%)", color = 'black', fontsize = 16)
+
+   
+   axi2.cla()
+   axi2.grid()
+   axi2.set_ylim(0, 100)
+   axi2.set_yticklabels([0, 20, 40, 60, 80, 100])   #fontsize=6
+   axi2.plot(data_freq, color='green')
+   axi2.set_title ("Uso de la RAM (%)", color = 'black', fontsize = 16)
+
+   
+   axi3.cla()
+   axi3.grid()
+   axi3.set_ylim(0,100)
+   axi3.set_yticklabels([0,20,40,60,80,100])   #fontsize=6
+   axi3.plot(data_currentfreq, color='red')
+   axi3.set_title ("CPU en IDLE (%)", color = 'black', fontsize = 16)
+
+   graph.draw()
+   
+   i += 1
+   
+   if (i == 10) :
     
-    mctotaldisco = psutil.disk_usage("C:\\").total/1e9
-    mcenusodisco = psutil.disk_usage("C:\\").percent
-    
-    valfreqCPU_percent.set(freqpercent)
-    valfreqCPU.set(currentfreq)
-    lblFreqCPUval.config(text="{:.1f}".format(valfreqCPU.get()))
-    memoriactotal.set(mctotaldisco)
-    memoriacenusopercent.set(mcenusodisco)
-    lbltotalMemoriadiscocx.config(text="{:.1f}".format(memoriactotal.get()))
-    
-    
-    
-    
-    root.after(1000, read_statistics)
-    
-root.after(100, read_statistics)
+       #memoria del disco total y porcentual
+       mctotaldisco = psutil.disk_usage("C:\\").total/1e9
+       mcenusodisco = psutil.disk_usage("C:\\").percent
+       #reescribir valores para barras de cpu
+       valfreqCPU_percent.set(freqpercent)
+       valfreqCPU.set(currentfreq)
+       #imprimir valores sobre las barras de freq de cpu
+       lblFreqCPUval.config(text="{:.1f}".format(valfreqCPU.get()))
+       #reescribir valores de memoria de disco y porcentaje
+       memoriactotal.set(mctotaldisco)
+       memoriacenusopercent.set(mcenusodisco)
+       #imprimir valores sobre la barra de memoria de disco
+       lbltotalMemoriadiscocx.config(text="{:.1f}".format(memoriactotal.get()))
+       i = 0
+   #######################################################################
+   
+   
+   
+   
+   root.after(100, read_statistics)
+   
+   
+   
+   
+
 
 #Frames
- 
-frm1 = Frame(root, relief = GROOVE, borderwidth = 5)
-frm2 = Frame(root)
-frm3 = Frame(root)
-frm4 = Frame(root)
+frm = Frame(root)
+frm1 = Frame(frm, relief = GROOVE, borderwidth = 5)
+frm2 = Frame(frm)
+frm3 = Frame(frm)
+#frm4 = Frame(root)
+frm.pack()
+frm1.grid(row = 0, column = 0, columnspan = 3)
+frm2.grid(row = 1, column = 0, columnspan = 3) 
+frm3.grid(row = 2, column = 0, columnspan = 3)
+#frm3.grid(row = 1, column = 1)
+#frm4.grid(row = 1, column = 2)
+#Figure
 
-frm1.grid(row = 0, column = 1, columnspan = 3)
-frm2.grid(row = 1, column = 0) 
-frm3.grid(row = 1, column = 1)
-frm4.grid(row = 1, column = 2)
+fig = Figure(figsize = (12,6))      #facecolor='black'
+#CPU pocentaje de uso
+axi1 = fig.add_subplot(131)    # facecolor='black'
+
+axi2 = fig.add_subplot(132)    # facecolor='black'
+
+
+axi3 = fig.add_subplot(133)    # facecolor='black'
+
+
+graph = FigureCanvasTkAgg(fig, master=frm2)
+graph.get_tk_widget().pack(side='top', fill='both', expand=True)
+
+
 
 #Menus
 main_menu = Menu(root)
@@ -84,8 +196,8 @@ main_menu.add_cascade(label="Editar", menu=menu_editar)
 main_menu.add_cascade(label="Ayuda", menu=menu_ayuda)
 
 # Status Bar
-#status_bar = Label(root, text="Listo", bd=1, relief=SUNKEN, anchor=W)
-#status_bar.pack(side=BOTTOM, expand=False, fill=X)
+status_bar = Label(root, text="Listo", bd=1, relief=SUNKEN, anchor=W)
+status_bar.pack(side=BOTTOM, expand=False, fill=X)
 
 
 # Widgets
@@ -99,6 +211,9 @@ lbltotalMemoriadiscoc = Label(frm1, text = "Memoria Total en Particion C:\\ [GB]
 lblMemoriadiscocusadapercent = Label(frm1, text = "Memoria usada en Particion C:\\[%]: ", bg='black', fg='white')
 lbltotalMemoriadiscocx = Label(frm1, text ="{}".format(memoriactotal.get()), fg = 'blue', font = "Verdana")
 barMemoriadiscocusada = ttk.Progressbar(frm1, length = 200, variable = memoriacenusopercent)
+btnLogu = Button(frm3, width = 12, text = "Log Memory",command = toggleu)
+btnLogd = Button(frm3, width = 12, text = "Log Memory",command = toggled)
+btnLogt = Button(frm3, width = 12, text = "Log Memory",command = togglet)
 
 
 lblFreqCPU.grid(row=0, column=0, pady=10)
@@ -110,4 +225,17 @@ lbltotalMemoriadiscoc.grid(row = 0, column = 3, padx = 10, sticky = 'e')
 lblMemoriadiscocusadapercent.grid(row = 1, column = 3, padx = 10 , sticky = 'e')
 lbltotalMemoriadiscocx.grid(row = 0, column = 4, padx = 4)
 barMemoriadiscocusada.grid(row = 1, column = 4)
+btnLogu.grid(row = 0, column = 0, padx = 150)
+btnLogd.grid(row = 0, column = 1)
+btnLogt.grid(row = 0, column = 2, padx = 150)
+
+with open("registro.csv", mode='w') as f: 
+    f.write("VALOR; TIEMPO\n")
+    f.write(str(psutil.cpu_percent()) +'; ' + str(datetime.now()))
+    
+
+root.after(100, read_statistics)
+
+
+
 root.mainloop()
