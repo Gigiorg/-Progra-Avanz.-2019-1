@@ -15,22 +15,7 @@ class App():
         frm = Frame(master, padx = 10, pady = 10)
         frm.pack()
         
-        self.out = []
-        self.url = "https://coinmarketcap.com/"
-        self.criptomonedas = {}
-        self.r1 = requests.get(self.url)
-        
-        self.soup1 = BeautifulSoup(self.r1.text, 'lxml')
-        
-        for idx, coin in enumerate(self.soup1.find_all('td', class_="no-wrap currency-name"), start=1):
-            print(f"{idx:0>2}: {coin.text.strip()}")
-            self.criptomonedas[idx] = coin['data-sort']
-    
-        for dato in self.criptomonedas.values():
-            self.out.append(dato)
-        
-        for x in self.out[5:len(self.out)]:
-            self.out.remove(x)
+        self.out= ['Bitcoin', 'Ethereum', 'XRP', 'Bitcoin Cash','Litecoin']
         
         self.amount = StringVar()
         self.nombrecrypto = StringVar()
@@ -66,34 +51,78 @@ class App():
         
         self.Notebook = ttk.Notebook(self.lblfrmTablas)
         self.Notebook.pack()
-        self.lblprov = Label(self.Notebook, text = "Text goes here", font = "Arial 16 bold")
-        self.Notebook.add(self.lblprov, text = "Info")
+        self.canvastext = Canvas(self.Notebook, width = 330, height = 220, bg = 'white')
+        self.Notebook.add(self.canvastext, text = "Info")
         
         #----------------Binds-------------------------------------
         self.cboCrypt.bind("<<ComboboxSelected>>", self.get_amount)
         
+        self.date_entry1.bind("<<DateEntrySelected>>",self.print_date_1)
+        self.date_entry2.bind("<<DateEntrySelected>>",self.print_date_2)
         
         
         #---------------Config-------------------------------------
         
         self.amount.set('0,000.00 USD')
-        master.after(1000, self.update_exch)
         
+    
+    def print_date_1(self,handle):
+        return self.date_entry1.get()
+        
+    def print_date_2(self,handle):
+        return self.date_entry2.get()
+        
+    
     def get_amount(self, handle):
         
         if self.nombrecrypto.get() == "Bitcoin":
             
+        
+           
            self.urlc = "https://api.coinbase.com/v2/prices/BTC-USD/spot"
            self.req = requests.get(self.urlc)
            self.data = self.req.json()
            self.amount.set(self.data['data']['amount'] + " USD")
              
+           self.urlinfo = "https://coinmarketcap.com/currencies/bitcoin/"
+           self.req2 = requests.get(self.urlinfo)
+
+           self.soup = BeautifulSoup(self.req2.text, 'lxml')
+    
+           self.text = self.soup.find('div', class_="col-sm-8").text   
+
+           self.my_wrap = textwrap.TextWrapper(width=60)
+           self.my_text_wrap = self.my_wrap.wrap(self.text)
+           
+           self.new_text = "\n".join(self.my_text_wrap)
+           
+           self.canvastext.delete("all")
+           self.canvastext.create_text(155,80,font="Arial 8", text=self.new_text)
+           
+
+           
         elif self.nombrecrypto.get() == "Ethereum":
             
            self.urlc = "https://api.coinbase.com/v2/prices/ETH-USD/spot"
            self.req = requests.get(self.urlc)
            self.data = self.req.json()
            self.amount.set(self.data['data']['amount'] + " USD")
+           
+           self.urlinfo = "https://coinmarketcap.com/currencies/ethereum/"
+           self.req2 = requests.get(self.urlinfo)
+
+           self.soup = BeautifulSoup(self.req2.text, 'lxml')
+    
+           self.text = self.soup.find('div', class_="col-sm-8").text   
+
+           self.my_wrap = textwrap.TextWrapper(width=60)
+           self.my_text_wrap = self.my_wrap.wrap(self.text)
+           
+           self.new_text = "\n".join(self.my_text_wrap)
+           
+           self.canvastext.delete("all")
+           self.canvastext.create_text(155,110,font="Arial 8", text=self.new_text)
+          
            
         elif self.nombrecrypto.get() == "XRP":
             
@@ -102,12 +131,43 @@ class App():
            self.data = self.req.json()
            self.amount.set(self.data['data']['amount'] + " USD")
            
+           self.urlinfo = "https://coinmarketcap.com/currencies/ripple/"
+           self.req2 = requests.get(self.urlinfo)
+
+           self.soup = BeautifulSoup(self.req2.text, 'lxml')
+    
+           self.text = self.soup.find('div', class_="col-sm-8").text   
+
+           self.my_wrap = textwrap.TextWrapper(width=60)
+           self.my_text_wrap = self.my_wrap.wrap(self.text)
+           
+           self.new_text = "\n".join(self.my_text_wrap)
+           
+           self.canvastext.delete("all")
+           self.canvastext.create_text(155,60,font="Arial 8", text=self.new_text)
+          
+           
         elif self.nombrecrypto.get() == "Bitcoin Cash":
             
            self.urlc = "https://api.coinbase.com/v2/prices/BCH-USD/spot"
            self.req = requests.get(self.urlc)
            self.data = self.req.json()
            self.amount.set(self.data['data']['amount'] + " USD")
+           
+           self.urlinfo = "https://coinmarketcap.com/currencies/bitcoin-cash/"
+           self.req2 = requests.get(self.urlinfo)
+
+           self.soup = BeautifulSoup(self.req2.text, 'lxml')
+    
+           self.text = self.soup.find('div', class_="col-sm-8").text   
+
+           self.my_wrap = textwrap.TextWrapper(width=60)
+           self.my_text_wrap = self.my_wrap.wrap(self.text)
+           
+           self.new_text = "\n".join(self.my_text_wrap)
+           
+           self.canvastext.delete("all")
+           self.canvastext.create_text(165,70,font="Arial 8", text=self.new_text)
            
         elif self.nombrecrypto.get() == "Litecoin":
             
@@ -116,49 +176,20 @@ class App():
            self.data = self.req.json()
            self.amount.set(self.data['data']['amount'] + " USD")
            
+           self.urlinfo = "https://coinmarketcap.com/currencies/litecoin/"
+           self.req2 = requests.get(self.urlinfo)
+
+           self.soup = BeautifulSoup(self.req2.text, 'lxml')
+    
+           self.text = self.soup.find('div', class_="col-sm-8").text   
+
+           self.my_wrap = textwrap.TextWrapper(width=60)
+           self.my_text_wrap = self.my_wrap.wrap(self.text)
            
-    def update_exch(self,handle):
-        self.change_exch()
-        
-    def change_exch(self,handle):
-        
-        
-        if self.nombrecrypto.get() == "Bitcoin":
-            
-           self.urlc = "https://api.coinbase.com/v2/prices/BTC-USD/spot"
-           self.req = requests.get(self.urlc)
-           self.data = self.req.json()
-           self.amount.set(self.data['data']['amount'] + " USD")
-           self.master.after(1000, self.update_exch)
-             
-        elif self.nombrecrypto.get() == "Ethereum":
-            
-           self.urlc = "https://api.coinbase.com/v2/prices/ETH-USD/spot"
-           self.req = requests.get(self.urlc)
-           self.data = self.req.json()
-           self.amount.set(self.data['data']['amount'] + " USD")
-           self.master.after(1000, self.update_exch)
-        elif self.nombrecrypto.get() == "XRP":
-            
-           self.urlc = "https://api.coinbase.com/v2/prices/XRP-USD/spot"
-           self.req = requests.get(self.urlc)
-           self.data = self.req.json()
-           self.amount.set(self.data['data']['amount'] + " USD")
-           self.master.after(1000, self.update_exch)
-        elif self.nombrecrypto.get() == "Bitcoin Cash":
-            
-           self.urlc = "https://api.coinbase.com/v2/prices/BCH-USD/spot"
-           self.req = requests.get(self.urlc)
-           self.data = self.req.json()
-           self.amount.set(self.data['data']['amount'] + " USD")
-           self.master.after(1000, self.update_exch)
-        elif self.nombrecrypto.get() == "Litecoin":
-            
-           self.urlc = "https://api.coinbase.com/v2/prices/LTC-USD/spot"
-           self.req = requests.get(self.urlc)
-           self.data = self.req.json()
-           self.amount.set(self.data['data']['amount'] + " USD")
-           self.master.after(1000, self.update_exch)
+           self.new_text = "\n".join(self.my_text_wrap)
+           
+           self.canvastext.delete("all")
+           self.canvastext.create_text(165,50,font="Arial 8", text=self.new_text)
            
 ############################
 
