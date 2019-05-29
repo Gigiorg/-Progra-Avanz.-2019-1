@@ -1,0 +1,171 @@
+import threading
+import textwrap
+from tkinter import *
+import tkinter.ttk as ttk
+import tkcalendar
+from bs4 import BeautifulSoup
+import requests
+
+class App():
+    
+    def __init__(self, master):
+        
+        self.master = master
+        root.title("Crypto Monitor")
+        frm = Frame(master, padx = 10, pady = 10)
+        frm.pack()
+        
+        self.out = []
+        self.url = "https://coinmarketcap.com/"
+        self.criptomonedas = {}
+        self.r1 = requests.get(self.url)
+        
+        self.soup1 = BeautifulSoup(self.r1.text, 'lxml')
+        
+        for idx, coin in enumerate(self.soup1.find_all('td', class_="no-wrap currency-name"), start=1):
+            print(f"{idx:0>2}: {coin.text.strip()}")
+            self.criptomonedas[idx] = coin['data-sort']
+    
+        for dato in self.criptomonedas.values():
+            self.out.append(dato)
+        
+        for x in self.out[5:len(self.out)]:
+            self.out.remove(x)
+        
+        self.amount = StringVar()
+        self.nombrecrypto = StringVar()
+        
+        self.lblfrmToken = ttk.LabelFrame(frm, text = "Token",width = 500)
+        self.lblfrmToken.grid(row = 0, column = 0, pady = 5)
+        
+        self.lblfrmRangofecha = ttk.LabelFrame(frm, text = "Rango Fecha",width = 500)
+        self.lblfrmRangofecha.grid(row = 1, column = 0, pady = 5)
+        
+        self.lblfrmTablas = ttk.LabelFrame(frm, text = "Tablas y Graficos",width = 500)
+        self.lblfrmTablas.grid(row = 2, column = 0, pady = 5)
+        #-----------------LBLFRM1------------------------------------
+        self.cboCrypt = ttk.Combobox(self.lblfrmToken, values = self.out, textvariable = self.nombrecrypto)
+        self.cboCrypt.grid(row = 0, column = 0,padx = 10, pady = 10)
+        
+        self.lblEquiv = Label(self.lblfrmToken, font = "Arial 16 bold", fg = "red", textvariable = self.amount)
+        self.lblEquiv.grid(row = 0, column = 1,padx = 10, pady = 10)
+
+        #-----------------LBLFRM2------------------------------------
+        
+        self.date_entry1 = tkcalendar.DateEntry(self.lblfrmRangofecha)
+        self.date_entry1.grid(row = 0, column = 0, padx = 4, pady = 4)
+        
+        self.date_entry2 = tkcalendar.DateEntry(self.lblfrmRangofecha)
+        self.date_entry2.grid(row = 0, column = 1, padx = 4, pady = 4)
+        
+        self.btnAsignar = Button(self.lblfrmRangofecha, text = "Asignar", width = 12)
+        self.btnAsignar.grid(row = 0, column = 2, padx = 5, pady = 3)
+        
+        
+        #-----------------LBLFRM3------------------------------------
+        
+        self.Notebook = ttk.Notebook(self.lblfrmTablas)
+        self.Notebook.pack()
+        self.lblprov = Label(self.Notebook, text = "Text goes here", font = "Arial 16 bold")
+        self.Notebook.add(self.lblprov, text = "Info")
+        
+        #----------------Binds-------------------------------------
+        self.cboCrypt.bind("<<ComboboxSelected>>", self.get_amount)
+        
+        
+        
+        #---------------Config-------------------------------------
+        
+        self.amount.set('0,000.00 USD')
+        master.after(1000, self.update_exch)
+        
+    def get_amount(self, handle):
+        
+        if self.nombrecrypto.get() == "Bitcoin":
+            
+           self.urlc = "https://api.coinbase.com/v2/prices/BTC-USD/spot"
+           self.req = requests.get(self.urlc)
+           self.data = self.req.json()
+           self.amount.set(self.data['data']['amount'] + " USD")
+             
+        elif self.nombrecrypto.get() == "Ethereum":
+            
+           self.urlc = "https://api.coinbase.com/v2/prices/ETH-USD/spot"
+           self.req = requests.get(self.urlc)
+           self.data = self.req.json()
+           self.amount.set(self.data['data']['amount'] + " USD")
+           
+        elif self.nombrecrypto.get() == "XRP":
+            
+           self.urlc = "https://api.coinbase.com/v2/prices/XRP-USD/spot"
+           self.req = requests.get(self.urlc)
+           self.data = self.req.json()
+           self.amount.set(self.data['data']['amount'] + " USD")
+           
+        elif self.nombrecrypto.get() == "Bitcoin Cash":
+            
+           self.urlc = "https://api.coinbase.com/v2/prices/BCH-USD/spot"
+           self.req = requests.get(self.urlc)
+           self.data = self.req.json()
+           self.amount.set(self.data['data']['amount'] + " USD")
+           
+        elif self.nombrecrypto.get() == "Litecoin":
+            
+           self.urlc = "https://api.coinbase.com/v2/prices/LTC-USD/spot"
+           self.req = requests.get(self.urlc)
+           self.data = self.req.json()
+           self.amount.set(self.data['data']['amount'] + " USD")
+           
+           
+    def update_exch(self,handle):
+        self.change_exch()
+        
+    def change_exch(self,handle):
+        
+        
+        if self.nombrecrypto.get() == "Bitcoin":
+            
+           self.urlc = "https://api.coinbase.com/v2/prices/BTC-USD/spot"
+           self.req = requests.get(self.urlc)
+           self.data = self.req.json()
+           self.amount.set(self.data['data']['amount'] + " USD")
+           self.master.after(1000, self.update_exch)
+             
+        elif self.nombrecrypto.get() == "Ethereum":
+            
+           self.urlc = "https://api.coinbase.com/v2/prices/ETH-USD/spot"
+           self.req = requests.get(self.urlc)
+           self.data = self.req.json()
+           self.amount.set(self.data['data']['amount'] + " USD")
+           self.master.after(1000, self.update_exch)
+        elif self.nombrecrypto.get() == "XRP":
+            
+           self.urlc = "https://api.coinbase.com/v2/prices/XRP-USD/spot"
+           self.req = requests.get(self.urlc)
+           self.data = self.req.json()
+           self.amount.set(self.data['data']['amount'] + " USD")
+           self.master.after(1000, self.update_exch)
+        elif self.nombrecrypto.get() == "Bitcoin Cash":
+            
+           self.urlc = "https://api.coinbase.com/v2/prices/BCH-USD/spot"
+           self.req = requests.get(self.urlc)
+           self.data = self.req.json()
+           self.amount.set(self.data['data']['amount'] + " USD")
+           self.master.after(1000, self.update_exch)
+        elif self.nombrecrypto.get() == "Litecoin":
+            
+           self.urlc = "https://api.coinbase.com/v2/prices/LTC-USD/spot"
+           self.req = requests.get(self.urlc)
+           self.data = self.req.json()
+           self.amount.set(self.data['data']['amount'] + " USD")
+           self.master.after(1000, self.update_exch)
+           
+############################
+
+root = Tk()
+
+
+
+
+app = App(root)
+root.mainloop()
