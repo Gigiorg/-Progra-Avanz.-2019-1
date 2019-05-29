@@ -1,3 +1,4 @@
+
 import threading
 import textwrap
 from tkinter import *
@@ -5,6 +6,7 @@ import tkinter.ttk as ttk
 import tkcalendar
 from bs4 import BeautifulSoup
 import requests
+from datetime import datetime, timedelta
 
 class App():
     
@@ -43,7 +45,7 @@ class App():
         self.date_entry2 = tkcalendar.DateEntry(self.lblfrmRangofecha)
         self.date_entry2.grid(row = 0, column = 1, padx = 4, pady = 4)
         
-        self.btnAsignar = Button(self.lblfrmRangofecha, text = "Asignar", width = 12)
+        self.btnAsignar = Button(self.lblfrmRangofecha, text = "Asignar", width = 12,command = self.printfinal)
         self.btnAsignar.grid(row = 0, column = 2, padx = 5, pady = 3)
         
         
@@ -57,15 +59,36 @@ class App():
         #----------------Binds-------------------------------------
         self.cboCrypt.bind("<<ComboboxSelected>>", self.get_amount)
         
-        self.date_entry1.bind("<<DateEntrySelected>>",self.print_date_1)
-        self.date_entry2.bind("<<DateEntrySelected>>",self.print_date_2)
+        self.date_entry1.bind("<<DateEntrySelected>>",lambda: self.print_date_1)
+        self.date_entry2.bind("<<DateEntrySelected>>",lambda: self.print_date_2)
         
         
         #---------------Config-------------------------------------
         
         self.amount.set('0,000.00 USD')
-        
+        self.date_entry2.set_date(datetime.now())
+        self.date_entry1.set_date(datetime.now() - timedelta(days =7 ))
     
+    def printfinal(self):
+        if self.nombrecrypto.get() == "Bitcoin":
+            print("Bitcoin", self.date_entry1.get(), self.date_entry2.get())
+
+           
+        elif self.nombrecrypto.get() == "Ethereum":
+            print("Ethereum", self.date_entry1.get(), self.date_entry2.get())
+            
+        elif self.nombrecrypto.get() == "XRP":
+            
+            print("XRP", self.date_entry1.get(), self.date_entry2.get())
+            
+        elif self.nombrecrypto.get() == "Bitcoin Cash":
+            
+            print("Bitcoin Cash", self.date_entry1.get(), self.date_entry2.get())
+           
+        elif self.nombrecrypto.get() == "Litecoin":
+            
+            print("Litecoin", self.date_entry1.get(), self.date_entry2.get())
+
     def print_date_1(self,handle):
         return self.date_entry1.get()
         
@@ -190,6 +213,7 @@ class App():
            
            self.canvastext.delete("all")
            self.canvastext.create_text(165,50,font="Arial 8", text=self.new_text)
+           
            
 ############################
 
