@@ -59,8 +59,6 @@ class App():
         #----------------Binds-------------------------------------
         self.cboCrypt.bind("<<ComboboxSelected>>", self.get_amount)
         
-        self.date_entry1.bind("<<DateEntrySelected>>",lambda: self.print_date_1)
-        self.date_entry2.bind("<<DateEntrySelected>>",lambda: self.print_date_2)
         
         
         #---------------Config-------------------------------------
@@ -89,11 +87,6 @@ class App():
             
             print("Litecoin", self.date_entry1.get(), self.date_entry2.get())
 
-    def print_date_1(self,handle):
-        return self.date_entry1.get()
-        
-    def print_date_2(self,handle):
-        return self.date_entry2.get()
         
     
     def get_amount(self, handle):
