@@ -7,6 +7,7 @@ import tkcalendar
 from bs4 import BeautifulSoup
 import requests
 from datetime import datetime, timedelta
+import pandas as pd
 
 class App():
     
@@ -68,10 +69,29 @@ class App():
         self.date_entry1.set_date(datetime.now() - timedelta(days =7 ))
     
     def printfinal(self):
+        
         if self.nombrecrypto.get() == "Bitcoin":
-            print("Bitcoin", self.date_entry1.get(), self.date_entry2.get())
-
-           
+            self.day1, self.month1, self.year1 = str(self.date_entry1.get()).split("/")
+            self.day2, self.month2, self.year2 = str(self.date_entry2.get()).split("/")
+            self.year1 = "20"+ self.year1
+            self.year2 = "20"+ self.year2
+            
+            if len(self.day1) == 1:
+                self.day1 = "0" + self.day1
+            
+            if len(self.day2) == 1:
+                self.day2 = "0" + self.day2
+            
+            self.date1= self.year1+ self.month1 + self.day1
+            self.date2= self.year2+ self.month2 + self.day2
+            self.urlb = "https://coinmarketcap.com/currencies/bitcoin/historical-data/?start="
+            self.urlb += self.date1
+            self.urlb += "&end="
+            self.urlb += self.date2
+            
+            self.tabla = pd.read_html(self.urlb)
+            print(self.tabla)
+            
         elif self.nombrecrypto.get() == "Ethereum":
             print("Ethereum", self.date_entry1.get(), self.date_entry2.get())
             
@@ -206,7 +226,6 @@ class App():
            
            self.canvastext.delete("all")
            self.canvastext.create_text(165,50,font="Arial 8", text=self.new_text)
-           
            
 ############################
 
