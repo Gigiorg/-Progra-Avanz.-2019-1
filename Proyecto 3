@@ -1,4 +1,5 @@
 
+
 import threading
 import textwrap
 from tkinter import *
@@ -56,6 +57,15 @@ class App():
         self.Notebook.pack()
         self.canvastext = Canvas(self.Notebook, width = 330, height = 220, bg = 'white')
         self.Notebook.add(self.canvastext, text = "Info")
+        self.tree = ttk.Treeview(self.Notebook,columns=['Open','Close'])
+        self.Notebook.add(self.tree, text = "Tabla")
+        self.tree.heading("#0", text="Fecha")
+        self.tree.heading("#1", text="Apertura")
+        self.tree.heading("#2", text="Cierre")
+                          
+        self.tree.column("#0", stretch=False, minwidth=90, width=100)
+        self.tree.column("#1", stretch=False, minwidth=100, width=100, anchor='e')
+        self.tree.column("#2", stretch=False, minwidth=100,  width=100, anchor='e')
         
         #----------------Binds-------------------------------------
         self.cboCrypt.bind("<<ComboboxSelected>>", self.get_amount)
@@ -90,7 +100,22 @@ class App():
             self.urlb += self.date2
             
             self.tabla = pd.read_html(self.urlb)
-            print(self.tabla)
+            self.tabla[0].drop(['High', 'Low', 'Volume', 'Market Cap'], axis=1, inplace = True)
+            print(self.tabla[0])
+            
+            df_cols = self.tabla[0].values
+            self.tree.delete(*self.tree.get_children())
+            
+            for x in range(len(df_cols)):
+        
+                self.tree.insert('', 'end', text = df_cols[x][0]
+                ,values= [df_cols[x][1],df_cols[x][2]])
+                    
+            
+            #for reg in self.tabla[0]:
+             #   self.tree.insert('', 'end', text=reg['alumno'],
+              #               values= [reg['PC1'], reg['PC2'], reg['PC3'], reg['PC4']])
+                
             
         elif self.nombrecrypto.get() == "Ethereum":
             print("Ethereum", self.date_entry1.get(), self.date_entry2.get())
@@ -111,6 +136,7 @@ class App():
     
     def get_amount(self, handle):
         
+        self.tree.delete(*self.tree.get_children())
         if self.nombrecrypto.get() == "Bitcoin":
             
         
@@ -226,6 +252,7 @@ class App():
            
            self.canvastext.delete("all")
            self.canvastext.create_text(165,50,font="Arial 8", text=self.new_text)
+
            
 ############################
 
