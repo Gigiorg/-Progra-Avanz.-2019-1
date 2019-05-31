@@ -112,11 +112,6 @@ class App():
                 ,values= [df_cols[x][1],df_cols[x][2]])
                     
             
-            #for reg in self.tabla[0]:
-             #   self.tree.insert('', 'end', text=reg['alumno'],
-              #               values= [reg['PC1'], reg['PC2'], reg['PC3'], reg['PC4']])
-                
-            
         elif self.nombrecrypto.get() == "Ethereum":
             print("Ethereum", self.date_entry1.get(), self.date_entry2.get())
             
