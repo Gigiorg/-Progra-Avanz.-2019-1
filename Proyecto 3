@@ -7,6 +7,11 @@ from bs4 import BeautifulSoup
 import requests
 from datetime import datetime, timedelta
 import pandas as pd
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+
+
 
 class App():
     
@@ -60,12 +65,19 @@ class App():
         self.tree.heading("#0", text="Fecha")
         self.tree.heading("#1", text="Apertura")
         self.tree.heading("#2", text="Cierre")
-        #self.tree.heading("#2", text="Dif. día")
+                          
+        self.tree.column("#0", stretch=False, minwidth=90, width=100)
+        self.tree.column("#1", stretch=False, minwidth=130, width=140, anchor='e')
+        self.tree.column("#2", stretch=False, minwidth=130,  width=140, anchor='e')
+                         
+        self.canvasgraph = Canvas(self.Notebook, width = 150, height = 150, bg = "white")
+        self.Notebook.add(self.canvasgraph, text = "Grafico")
+        #
         
-        self.tree.column("#0", stretch=False, minwidth=90, width=90)
-        self.tree.column("#1", stretch=False, minwidth=90, width=90, anchor='e')
-        self.tree.column("#2", stretch=False, minwidth=90,  width=90, anchor='e')
-        #self.tree.column("#3", stretch=False, minwidth=90,  width=90, anchor='e')
+    
+        
+
+        
         
         #----------------Binds-------------------------------------
         self.cboCrypt.bind("<<ComboboxSelected>>", self.get_amount)
@@ -80,7 +92,11 @@ class App():
     
     def printfinal(self):
         
+    
+        
+        
         if self.nombrecrypto.get() == "Bitcoin":
+            self.canvasgraph.delete('all')
             self.day1, self.month1, self.year1 = str(self.date_entry1.get()).split("/")
             self.day2, self.month2, self.year2 = str(self.date_entry2.get()).split("/")
             self.year1 = "20"+ self.year1
@@ -111,9 +127,37 @@ class App():
                 self.tree.insert('', 'end', text = df_cols[x][0]
                 ,values= [df_cols[x][1],df_cols[x][2]])
                     
+            self.fig = Figure() 
+            
+            try: 
+                self.graph.get_tk_widget().pack_forget()
+                
+            except AttributeError: 
+                
+                pass
+            
+            self.graph = FigureCanvasTkAgg(self.fig, master=self.canvasgraph)
+            self.graph.get_tk_widget().pack(side='top', fill='both', expand=True)
+            
+            
+        
+            self.ax = self.fig.add_subplot(111)  
+            
+            self.tabla[0]['Date'] = pd.to_datetime(self.tabla[0]['Date'])
+            self.tablon1 = self.tabla[0]['Date'].values[::-1]
+            self.tablon2 = self.tabla[0]['Close**'].values[::-1]
+            self.ax.cla()
+            self.ax.grid()
+            self.ax.plot(self.tablon1,self.tablon2, color='blue')
+            self.ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%Y'))
+            self.ax.xaxis.set_major_locator(mdates.MonthLocator(interval=8))
+            self.ax.set_xlabel("Fecha")
+            self.ax.set_ylabel("Valor ($)")
+            self.graph.draw()
+            self.canvasgraph.delete('all')
             
         elif self.nombrecrypto.get() == "Ethereum":
-            print("Ethereum", self.date_entry1.get(), self.date_entry2.get())
+            self.canvasgraph.delete('all')
             self.day1, self.month1, self.year1 = str(self.date_entry1.get()).split("/")
             self.day2, self.month2, self.year2 = str(self.date_entry2.get()).split("/")
             self.year1 = "20"+ self.year1
@@ -127,7 +171,7 @@ class App():
             
             self.date1= self.year1+ self.month1 + self.day1
             self.date2= self.year2+ self.month2 + self.day2
-            self.urlb = 'https://coinmarketcap.com/currencies/ethereum/historical-data/?start='
+            self.urlb = "https://coinmarketcap.com/currencies/ethereum/historical-data/?start="
             self.urlb += self.date1
             self.urlb += "&end="
             self.urlb += self.date2
@@ -143,10 +187,40 @@ class App():
         
                 self.tree.insert('', 'end', text = df_cols[x][0]
                 ,values= [df_cols[x][1],df_cols[x][2]])
+                    
+            self.fig = Figure() 
+            
+            try: 
+                self.graph.get_tk_widget().pack_forget()
+                
+            except AttributeError: 
+                
+                pass
+            
+            self.graph = FigureCanvasTkAgg(self.fig, master=self.canvasgraph)
+            self.graph.get_tk_widget().pack(side='top', fill='both', expand=True)
+            
+            
+        
+            self.ax = self.fig.add_subplot(111)  
+            
+            self.tabla[0]['Date'] = pd.to_datetime(self.tabla[0]['Date'])
+            self.tablon1 = self.tabla[0]['Date'].values[::-1]
+            self.tablon2 = self.tabla[0]['Close**'].values[::-1]
+            self.ax.cla()
+            self.ax.grid()
+            self.ax.plot(self.tablon1,self.tablon2, color='blue')
+            self.ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%Y'))
+            self.ax.xaxis.set_major_locator(mdates.MonthLocator(interval=8))
+            self.ax.set_xlabel("Fecha")
+            self.ax.set_ylabel("Valor ($)")
+            self.graph.draw()
+            self.canvasgraph.delete('all')
+            
             
         elif self.nombrecrypto.get() == "XRP":
             
-            print("XRP", self.date_entry1.get(), self.date_entry2.get())
+            self.canvasgraph.delete('all')
             self.day1, self.month1, self.year1 = str(self.date_entry1.get()).split("/")
             self.day2, self.month2, self.year2 = str(self.date_entry2.get()).split("/")
             self.year1 = "20"+ self.year1
@@ -160,7 +234,7 @@ class App():
             
             self.date1= self.year1+ self.month1 + self.day1
             self.date2= self.year2+ self.month2 + self.day2
-            self.urlb = 'https://coinmarketcap.com/currencies/ripple/historical-data/?start='
+            self.urlb = "https://coinmarketcap.com/currencies/ripple/historical-data/?start="
             self.urlb += self.date1
             self.urlb += "&end="
             self.urlb += self.date2
@@ -176,10 +250,39 @@ class App():
         
                 self.tree.insert('', 'end', text = df_cols[x][0]
                 ,values= [df_cols[x][1],df_cols[x][2]])
+                    
+            self.fig = Figure() 
+            
+            try: 
+                self.graph.get_tk_widget().pack_forget()
+                
+            except AttributeError: 
+                
+                pass
+            
+            self.graph = FigureCanvasTkAgg(self.fig, master=self.canvasgraph)
+            self.graph.get_tk_widget().pack(side='top', fill='both', expand=True)
+            
+            
+        
+            self.ax = self.fig.add_subplot(111)  
+            
+            self.tabla[0]['Date'] = pd.to_datetime(self.tabla[0]['Date'])
+            self.tablon1 = self.tabla[0]['Date'].values[::-1]
+            self.tablon2 = self.tabla[0]['Close**'].values[::-1]
+            self.ax.cla()
+            self.ax.grid()
+            self.ax.plot(self.tablon1,self.tablon2, color='blue')
+            self.ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%Y'))
+            self.ax.xaxis.set_major_locator(mdates.MonthLocator(interval=8))
+            self.ax.set_xlabel("Fecha")
+            self.ax.set_ylabel("Valor ($)")
+            self.graph.draw()
+            self.canvasgraph.delete('all')
             
         elif self.nombrecrypto.get() == "Bitcoin Cash":
             
-            print("Bitcoin Cash", self.date_entry1.get(), self.date_entry2.get())
+            self.canvasgraph.delete('all')
             self.day1, self.month1, self.year1 = str(self.date_entry1.get()).split("/")
             self.day2, self.month2, self.year2 = str(self.date_entry2.get()).split("/")
             self.year1 = "20"+ self.year1
@@ -193,7 +296,7 @@ class App():
             
             self.date1= self.year1+ self.month1 + self.day1
             self.date2= self.year2+ self.month2 + self.day2
-            self.urlb = 'https://coinmarketcap.com/currencies/bitcoin-cash/historical-data/?start='
+            self.urlb = "https://coinmarketcap.com/currencies/bitcoin-cash/historical-data/?start="
             self.urlb += self.date1
             self.urlb += "&end="
             self.urlb += self.date2
@@ -209,10 +312,39 @@ class App():
         
                 self.tree.insert('', 'end', text = df_cols[x][0]
                 ,values= [df_cols[x][1],df_cols[x][2]])
+                    
+            self.fig = Figure() 
             
+            try: 
+                self.graph.get_tk_widget().pack_forget()
+                
+            except AttributeError: 
+                
+                pass
+            
+            self.graph = FigureCanvasTkAgg(self.fig, master=self.canvasgraph)
+            self.graph.get_tk_widget().pack(side='top', fill='both', expand=True)
+            
+            
+        
+            self.ax = self.fig.add_subplot(111)  
+            
+            self.tabla[0]['Date'] = pd.to_datetime(self.tabla[0]['Date'])
+            self.tablon1 = self.tabla[0]['Date'].values[::-1]
+            self.tablon2 = self.tabla[0]['Close**'].values[::-1]
+            self.ax.cla()
+            self.ax.grid()
+            self.ax.plot(self.tablon1,self.tablon2, color='blue')
+            self.ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%Y'))
+            self.ax.xaxis.set_major_locator(mdates.MonthLocator(interval=8))
+            self.ax.set_xlabel("Fecha")
+            self.ax.set_ylabel("Valor ($)")
+            self.graph.draw()
+            self.canvasgraph.delete('all')
+           
         elif self.nombrecrypto.get() == "Litecoin":
             
-            print("Litecoin", self.date_entry1.get(), self.date_entry2.get())
+            self.canvasgraph.delete('all')
             self.day1, self.month1, self.year1 = str(self.date_entry1.get()).split("/")
             self.day2, self.month2, self.year2 = str(self.date_entry2.get()).split("/")
             self.year1 = "20"+ self.year1
@@ -226,7 +358,7 @@ class App():
             
             self.date1= self.year1+ self.month1 + self.day1
             self.date2= self.year2+ self.month2 + self.day2
-            self.urlb = 'https://coinmarketcap.com/currencies/litecoin/historical-data/?start='
+            self.urlb = "https://coinmarketcap.com/currencies/litecoin/historical-data/?start="
             self.urlb += self.date1
             self.urlb += "&end="
             self.urlb += self.date2
@@ -242,7 +374,36 @@ class App():
         
                 self.tree.insert('', 'end', text = df_cols[x][0]
                 ,values= [df_cols[x][1],df_cols[x][2]])
+                    
+            self.fig = Figure() 
             
+            try: 
+                self.graph.get_tk_widget().pack_forget()
+                
+            except AttributeError: 
+                
+                pass
+            
+            self.graph = FigureCanvasTkAgg(self.fig, master=self.canvasgraph)
+            self.graph.get_tk_widget().pack(side='top', fill='both', expand=True)
+            
+            
+        
+            self.ax = self.fig.add_subplot(111)  
+            
+            self.tabla[0]['Date'] = pd.to_datetime(self.tabla[0]['Date'])
+            self.tablon1 = self.tabla[0]['Date'].values[::-1]
+            self.tablon2 = self.tabla[0]['Close**'].values[::-1]
+            self.ax.cla()
+            self.ax.grid()
+            self.ax.plot(self.tablon1,self.tablon2, color='blue')
+            self.ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%Y'))
+            self.ax.xaxis.set_major_locator(mdates.MonthLocator(interval=8))
+            self.ax.set_xlabel("Fecha")
+            self.ax.set_ylabel("Valor ($)")
+            self.graph.draw()
+            self.canvasgraph.delete('all')
+
         
     
     def get_amount(self, handle):
@@ -250,6 +411,8 @@ class App():
         self.tree.delete(*self.tree.get_children())
         if self.nombrecrypto.get() == "Bitcoin":
             
+        
+           
            self.urlc = "https://api.coinbase.com/v2/prices/BTC-USD/spot"
            self.req = requests.get(self.urlc)
            self.data = self.req.json()
@@ -262,13 +425,13 @@ class App():
     
            self.text = self.soup.find('div', class_="col-sm-8").text   
 
-           self.my_wrap = textwrap.TextWrapper(width=60)
+           self.my_wrap = textwrap.TextWrapper(width=63)
            self.my_text_wrap = self.my_wrap.wrap(self.text)
            
            self.new_text = "\n".join(self.my_text_wrap)
            
            self.canvastext.delete("all")
-           self.canvastext.create_text(155,80,font="Arial 8", text=self.new_text)
+           self.canvastext.create_text(175,80,font="Arial 8", text=self.new_text)
            
 
            
@@ -361,6 +524,7 @@ class App():
            
            self.canvastext.delete("all")
            self.canvastext.create_text(165,50,font="Arial 8", text=self.new_text)
+
 
            
 ############################
