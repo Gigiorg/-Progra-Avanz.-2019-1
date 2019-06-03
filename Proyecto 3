@@ -10,8 +10,12 @@ import pandas as pd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+import threading
+from time import sleep
 
+global lista_valor
 
+lista_valor = [0, 0, 0, 0, 0]
 
 class App():
     
@@ -39,7 +43,7 @@ class App():
         self.cboCrypt = ttk.Combobox(self.lblfrmToken, values = self.out, textvariable = self.nombrecrypto)
         self.cboCrypt.grid(row = 0, column = 0,padx = 10, pady = 10)
         
-        self.lblEquiv = Label(self.lblfrmToken, font = "Arial 16 bold", fg = "red", textvariable = self.amount)
+        self.lblEquiv = Label(self.lblfrmToken, font = "Arial 16 bold", textvariable = self.amount)
         self.lblEquiv.grid(row = 0, column = 1,padx = 10, pady = 10)
 
         #-----------------LBLFRM2------------------------------------
@@ -89,10 +93,18 @@ class App():
         self.amount.set('0,000.00 USD')
         self.date_entry2.set_date(datetime.now())
         self.date_entry1.set_date(datetime.now() - timedelta(days =7 ))
+        #--------------Threading-----------------------------------
+        
+        self.master.after(2, self.start_animation)
+    
+    def start_animation(self):
+        self.thr1 = threading.Thread(target = self.animation_loop, daemon=True)
+        self.thr1.start()
+    
+    def animation_loop(self):
+        self.get_amount2()
     
     def printfinal(self):
-        
-    
         
         
         if self.nombrecrypto.get() == "Bitcoin":
@@ -407,126 +419,239 @@ class App():
         
     
     def get_amount(self, handle):
-        
         self.tree.delete(*self.tree.get_children())
+        
+        #global lista_valor 
         if self.nombrecrypto.get() == "Bitcoin":
             
-        
-           
-           self.urlc = "https://api.coinbase.com/v2/prices/BTC-USD/spot"
-           self.req = requests.get(self.urlc)
-           self.data = self.req.json()
-           self.amount.set(self.data['data']['amount'] + " USD")
-             
-           self.urlinfo = "https://coinmarketcap.com/currencies/bitcoin/"
-           self.req2 = requests.get(self.urlinfo)
 
-           self.soup = BeautifulSoup(self.req2.text, 'lxml')
+            self.urlc = "https://api.coinbase.com/v2/prices/BTC-USD/spot"
+            self.req = requests.get(self.urlc)
+            self.data = self.req.json()
+            self.amount.set(self.data['data']['amount'] + " USD") 
+            #valor = float(self.data['data']['amount'])
+            
+            #if valor >= lista_valor[0]:
+            #    self.lblEquiv.config(fg = "green")
+            #    self.amount.set(self.data['data']['amount'] + " USD")
+            #    lista_valor[0] = valor
+                
+            #else :
+            #    self.lblEquiv.config(fg = "red")
+            #    self.amount.set(self.data['data']['amount'] + " USD")
+            #    lista_valor[0] = valor 
+            
+            #print (valor)
+            
+            self.urlinfo = "https://coinmarketcap.com/currencies/bitcoin/"
+            self.req2 = requests.get(self.urlinfo)
+
+            self.soup = BeautifulSoup(self.req2.text, 'lxml')
     
-           self.text = self.soup.find('div', class_="col-sm-8").text   
+            self.text = self.soup.find('div', class_="col-sm-8").text   
 
-           self.my_wrap = textwrap.TextWrapper(width=63)
-           self.my_text_wrap = self.my_wrap.wrap(self.text)
+            self.my_wrap = textwrap.TextWrapper(width=63)
+            self.my_text_wrap = self.my_wrap.wrap(self.text)
            
-           self.new_text = "\n".join(self.my_text_wrap)
+            self.new_text = "\n".join(self.my_text_wrap)
            
-           self.canvastext.delete("all")
-           self.canvastext.create_text(175,80,font="Arial 8", text=self.new_text)
+            self.canvastext.delete("all")
+            self.canvastext.create_text(175,80,font="Arial 8", text=self.new_text)
            
 
            
         elif self.nombrecrypto.get() == "Ethereum":
             
-           self.urlc = "https://api.coinbase.com/v2/prices/ETH-USD/spot"
-           self.req = requests.get(self.urlc)
-           self.data = self.req.json()
-           self.amount.set(self.data['data']['amount'] + " USD")
+            self.urlc = "https://api.coinbase.com/v2/prices/ETH-USD/spot"
+            self.req = requests.get(self.urlc)
+            self.data = self.req.json()
+            self.amount.set(self.data['data']['amount'] + " USD")
            
-           self.urlinfo = "https://coinmarketcap.com/currencies/ethereum/"
-           self.req2 = requests.get(self.urlinfo)
+            self.urlinfo = "https://coinmarketcap.com/currencies/ethereum/"
+            self.req2 = requests.get(self.urlinfo)
 
-           self.soup = BeautifulSoup(self.req2.text, 'lxml')
+            self.soup = BeautifulSoup(self.req2.text, 'lxml')
     
-           self.text = self.soup.find('div', class_="col-sm-8").text   
+            self.text = self.soup.find('div', class_="col-sm-8").text   
 
-           self.my_wrap = textwrap.TextWrapper(width=60)
-           self.my_text_wrap = self.my_wrap.wrap(self.text)
+            self.my_wrap = textwrap.TextWrapper(width=60)
+            self.my_text_wrap = self.my_wrap.wrap(self.text)
            
-           self.new_text = "\n".join(self.my_text_wrap)
+            self.new_text = "\n".join(self.my_text_wrap)
            
-           self.canvastext.delete("all")
-           self.canvastext.create_text(155,110,font="Arial 8", text=self.new_text)
+            self.canvastext.delete("all")
+            self.canvastext.create_text(155,110,font="Arial 8", text=self.new_text)
           
            
         elif self.nombrecrypto.get() == "XRP":
             
-           self.urlc = "https://api.coinbase.com/v2/prices/XRP-USD/spot"
-           self.req = requests.get(self.urlc)
-           self.data = self.req.json()
-           self.amount.set(self.data['data']['amount'] + " USD")
+            self.urlc = "https://api.coinbase.com/v2/prices/XRP-USD/spot"
+            self.req = requests.get(self.urlc)
+            self.data = self.req.json()
+            self.amount.set(self.data['data']['amount'] + " USD")
            
-           self.urlinfo = "https://coinmarketcap.com/currencies/ripple/"
-           self.req2 = requests.get(self.urlinfo)
+            self.urlinfo = "https://coinmarketcap.com/currencies/ripple/"
+            self.req2 = requests.get(self.urlinfo)
 
-           self.soup = BeautifulSoup(self.req2.text, 'lxml')
+            self.soup = BeautifulSoup(self.req2.text, 'lxml')
     
-           self.text = self.soup.find('div', class_="col-sm-8").text   
+            self.text = self.soup.find('div', class_="col-sm-8").text   
 
-           self.my_wrap = textwrap.TextWrapper(width=60)
-           self.my_text_wrap = self.my_wrap.wrap(self.text)
+            self.my_wrap = textwrap.TextWrapper(width=60)
+            self.my_text_wrap = self.my_wrap.wrap(self.text)
            
-           self.new_text = "\n".join(self.my_text_wrap)
+            self.new_text = "\n".join(self.my_text_wrap)
            
-           self.canvastext.delete("all")
-           self.canvastext.create_text(155,60,font="Arial 8", text=self.new_text)
+            self.canvastext.delete("all")
+            self.canvastext.create_text(155,60,font="Arial 8", text=self.new_text)
           
            
         elif self.nombrecrypto.get() == "Bitcoin Cash":
             
-           self.urlc = "https://api.coinbase.com/v2/prices/BCH-USD/spot"
-           self.req = requests.get(self.urlc)
-           self.data = self.req.json()
-           self.amount.set(self.data['data']['amount'] + " USD")
+            self.urlc = "https://api.coinbase.com/v2/prices/BCH-USD/spot"
+            self.req = requests.get(self.urlc)
+            self.data = self.req.json()
+            self.amount.set(self.data['data']['amount'] + " USD")
            
-           self.urlinfo = "https://coinmarketcap.com/currencies/bitcoin-cash/"
-           self.req2 = requests.get(self.urlinfo)
+            self.urlinfo = "https://coinmarketcap.com/currencies/bitcoin-cash/"
+            self.req2 = requests.get(self.urlinfo)
 
-           self.soup = BeautifulSoup(self.req2.text, 'lxml')
+            self.soup = BeautifulSoup(self.req2.text, 'lxml')
     
-           self.text = self.soup.find('div', class_="col-sm-8").text   
+            self.text = self.soup.find('div', class_="col-sm-8").text   
 
-           self.my_wrap = textwrap.TextWrapper(width=60)
-           self.my_text_wrap = self.my_wrap.wrap(self.text)
+            self.my_wrap = textwrap.TextWrapper(width=60)
+            self.my_text_wrap = self.my_wrap.wrap(self.text)
            
-           self.new_text = "\n".join(self.my_text_wrap)
+            self.new_text = "\n".join(self.my_text_wrap)
            
-           self.canvastext.delete("all")
-           self.canvastext.create_text(165,70,font="Arial 8", text=self.new_text)
+            self.canvastext.delete("all")
+            self.canvastext.create_text(165,70,font="Arial 8", text=self.new_text)
            
         elif self.nombrecrypto.get() == "Litecoin":
             
-           self.urlc = "https://api.coinbase.com/v2/prices/LTC-USD/spot"
-           self.req = requests.get(self.urlc)
-           self.data = self.req.json()
-           self.amount.set(self.data['data']['amount'] + " USD")
+            self.urlc = "https://api.coinbase.com/v2/prices/LTC-USD/spot"
+            self.req = requests.get(self.urlc)
+            self.data = self.req.json()
+            self.amount.set(self.data['data']['amount'] + " USD")
            
-           self.urlinfo = "https://coinmarketcap.com/currencies/litecoin/"
-           self.req2 = requests.get(self.urlinfo)
+            self.urlinfo = "https://coinmarketcap.com/currencies/litecoin/"
+            self.req2 = requests.get(self.urlinfo)
 
-           self.soup = BeautifulSoup(self.req2.text, 'lxml')
+            self.soup = BeautifulSoup(self.req2.text, 'lxml')
     
-           self.text = self.soup.find('div', class_="col-sm-8").text   
+            self.text = self.soup.find('div', class_="col-sm-8").text   
 
-           self.my_wrap = textwrap.TextWrapper(width=60)
-           self.my_text_wrap = self.my_wrap.wrap(self.text)
+            self.my_wrap = textwrap.TextWrapper(width=60)
+            self.my_text_wrap = self.my_wrap.wrap(self.text)
            
-           self.new_text = "\n".join(self.my_text_wrap)
+            self.new_text = "\n".join(self.my_text_wrap)
            
-           self.canvastext.delete("all")
-           self.canvastext.create_text(165,50,font="Arial 8", text=self.new_text)
+            self.canvastext.delete("all")
+            self.canvastext.create_text(165,50,font="Arial 8", text=self.new_text)
+        
+         
+        
+    def get_amount2 (self):
+            
+        global lista_valor 
+        #sleep (1)
+        #self.tree.delete(*self.tree.get_children())
+    
+        
+        if self.nombrecrypto.get() == "Bitcoin":
 
-
-           
+            self.urlc = "https://api.coinbase.com/v2/prices/BTC-USD/spot"
+            self.req = requests.get(self.urlc)
+            self.data = self.req.json()
+           #self.amount.set(self.data['data']['amount'] + " USD")
+            valor = float(self.data['data']['amount'])
+            if valor > lista_valor[0]:
+                self.lblEquiv.config(fg = "green")
+                self.amount.set(self.data['data']['amount'] + " USD")
+                lista_valor[0] = valor
+                
+            elif valor < lista_valor[0] :
+                self.lblEquiv.config(fg = "red")
+                self.amount.set(self.data['data']['amount'] + " USD")
+                lista_valor[0] = valor 
+            else : 
+                self.amount.set(self.data['data']['amount'] + " USD")
+                lista_valor[0] = valor
+                
+        elif self.nombrecrypto.get() == "Ethereum":
+            
+            self.urlc = "https://api.coinbase.com/v2/prices/ETH-USD/spot"
+            self.req = requests.get(self.urlc)
+            self.data = self.req.json()
+            
+            valor = float(self.data['data']['amount'])
+            if valor > lista_valor[1]:
+                self.lblEquiv.config(fg = "green")
+                self.amount.set(self.data['data']['amount'] + " USD")
+                lista_valor[1] = valor 
+            elif valor < lista_valor[1] :
+                self.lblEquiv.config(fg = "red")
+                self.amount.set(self.data['data']['amount'] + " USD")
+                lista_valor[1] = valor 
+            else : 
+                self.amount.set(self.data['data']['amount'] + " USD")
+                lista_valor[1] = valor
+                
+        elif self.nombrecrypto.get() == "XRP":
+            self.urlc = "https://api.coinbase.com/v2/prices/XRP-USD/spot"
+            self.req = requests.get(self.urlc)
+            self.data = self.req.json()
+            
+            valor = float(self.data['data']['amount'])
+            if valor > lista_valor[2]:
+                self.lblEquiv.config(fg = "green")
+                self.amount.set(self.data['data']['amount'] + " USD")
+                lista_valor[2] = valor 
+            elif valor < lista_valor[2] :
+                self.lblEquiv.config(fg = "red")
+                self.amount.set(self.data['data']['amount'] + " USD")
+                lista_valor[2] = valor 
+            else : 
+                self.amount.set(self.data['data']['amount'] + " USD")
+                lista_valor[2] = valor
+                
+        elif self.nombrecrypto.get() == "Bitcoin Cash":
+            self.urlc = "https://api.coinbase.com/v2/prices/BCH-USD/spot"
+            self.req = requests.get(self.urlc)
+            self.data = self.req.json()
+            valor = float(self.data['data']['amount'])
+            if valor > lista_valor[3]:
+                self.lblEquiv.config(fg = "green")
+                self.amount.set(self.data['data']['amount'] + " USD")
+                lista_valor[3] = valor 
+            elif valor < lista_Valor[3] :
+                self.lblEquiv.config(fg = "red")
+                self.amount.set(self.data['data']['amount'] + " USD")
+                lista_valor[3] = valor
+            else : 
+                self.amount.set(self.data['data']['amount'] + " USD")
+                lista_valor[3] = valor
+                
+        elif self.nombrecrypto.get() == "Litecoin":
+            
+            self.urlc = "https://api.coinbase.com/v2/prices/LTC-USD/spot"
+            self.req = requests.get(self.urlc)
+            self.data = self.req.json()
+            valor = float(self.data['data']['amount'])
+            if valor > lista_valor[4]:
+                self.lblEquiv.config(fg = "green")
+                self.amount.set(self.data['data']['amount'] + " USD")
+                lista_valor[4] = valor 
+            elif valor < lista_valor[4]:
+                self.lblEquiv.config(fg = "red")
+                self.amount.set(self.data['data']['amount'] + " USD")
+                lista_valor[4] = valor
+            else : 
+                self.amount.set(self.data['data']['amount'] + " USD")
+                lista_valor[4] = valor
+                
+        self.master.after(1, self.get_amount2) 
 ############################
 
 root = Tk()
